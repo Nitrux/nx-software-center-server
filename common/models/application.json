@@ -1,0 +1,72 @@
+{
+  "name": "Application",
+  "plural": "applications",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "required": true,
+      "id": true,
+      "generated": false
+    },
+    "codeName": {
+      "type": "string",
+      "required": true
+    },
+    "version": {
+      "type": "string",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "arch": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string"
+    },
+    "licence": {
+      "type": "string"
+    },
+    "authors": {
+      "type": [
+        "string"
+      ]
+    },
+    "categories": {
+      "type": [
+        "string"
+      ]
+    },
+    "screenshots": {
+      "type": [
+        "string"
+      ]
+    },
+    "downloadUrl": {
+      "type": "string",
+      "required": true
+    },
+    "downloadSize": {
+      "type": "string",
+      "required": true
+    },
+    "homePageUrl": {
+      "type": "string"
+    },
+    "iconUrl": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

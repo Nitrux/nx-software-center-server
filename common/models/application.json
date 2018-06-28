@@ -1,4 +1,4 @@
-{
+  {
   "name": "Application",
   "plural": "applications",
   "base": "PersistedModel",
@@ -13,60 +13,78 @@
       "id": true,
       "generated": false
     },
-    "codeName": {
-      "type": "string",
-      "required": true
-    },
-    "version": {
-      "type": "string",
-      "required": true
-    },
     "name": {
-      "type": "string",
-      "required": true
+      "type": "object",
+      "required": true,
+      "properties": {}
     },
-    "arch": {
-      "type": "string",
-      "required": true
+    "summary": {
+      "type": "object",
+      "required": true,
+      "properties": {}
     },
     "description": {
-      "type": "string"
+      "type": "object",
+      "required": true,
+      "properties": {}
     },
-    "licence": {
-      "type": "string"
-    },
-    "authors": {
-      "type": [
-        "string"
-      ]
+    "developer": {
+      "type": "object",
+      "properties": {
+        "name" : { "type" : "string" },
+        "avatar" : { "type" : "string" },
+        "blog" : { "type" : "string" },
+        "key" : { "type" : "string" }
+      }
     },
     "categories": {
       "type": [
         "string"
       ]
     },
-    "screenshots": {
+    "keywords": {
       "type": [
         "string"
       ]
     },
-    "downloadUrl": {
-      "type": "string",
-      "required": true
-    },
-    "downloadSize": {
-      "type": "string",
-      "required": true
-    },
-    "homePageUrl": {
+    "icon": {
       "type": "string"
     },
-    "iconUrl": {
-      "type": "string"
+    "screenshots": {
+      "type": [
+        "object"
+      ]
+    },
+    "links": {
+      "type": "object",
+      "required": false,
+      "properties": {
+        "homePage" : { "type" : "string" },
+        "help" : { "type" : "string" },
+        "donations" : { "type" : "string" },
+        "bugtracker" : { "type" : "string" }
+      }
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "license": {
+      "type": "belongsTo",
+      "model": "License",
+      "foreignKey": "licenceId",
+      "options": {
+        "nestRemoting": true
+      }
+    },
+    "releases": {
+      "type": "hasMany",
+      "model": "Release",
+      "foreignKey": "applicationId",
+      "options": {
+        "nestRemoting": true
+      }
+    }
+  },
   "acls": [],
   "methods": {}
 }

@@ -1,0 +1,37 @@
+{
+  "name": "Release",
+  "plural": "releases",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "channel": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "changelog": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "files": {
+      "type": "hasMany",
+      "model": "File",
+      "foreignKey": "releaseId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

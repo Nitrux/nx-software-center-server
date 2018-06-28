@@ -38,5 +38,17 @@
   "Application": {
     "dataSource": "db",
     "public": true
+  },
+  "License": {
+    "dataSource": "db",
+    "public": false
+  },
+  "Release": {
+    "dataSource": "db",
+    "public": false
+  },
+  "File": {
+    "dataSource": "db",
+    "public": false
   }
 }

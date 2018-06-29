@@ -7,10 +7,10 @@
     "host": "localhost",
     "port": 27017,
     "url": "",
-    "database": "nitrux",
-    "password": "nxsecret%401234",
-    "name": "mongodb",
-    "user": "mongouser",
+    "database": "db",
+    "password": "pass",
+    "name": "name",
+    "user": "user",
     "connector": "mongodb"
   }
 }

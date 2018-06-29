@@ -50,5 +50,9 @@
   "File": {
     "dataSource": "db",
     "public": false
+  },
+  "ApplicationTextsBlob": {
+    "dataSource": "db",
+    "public": false
   }
 }

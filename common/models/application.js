@@ -1,35 +1,69 @@
 'use strict';
 
-module.exports = function (Application) {
-
+module.exports = function(Application) {
   Application.remoteMethod(
     'register_appimage',
     {
-      accepts: [{arg: 'AppImageInfo', type: "object", description: "AppImageInfo to be uploaded."}],
+      accepts: {
+        arg: 'AppImageInfo',
+        type: 'object',
+        description: 'AppImageInfo to be uploaded.',
+      },
       returns: [
         {arg: 'accepted', type: 'boolean'},
-        {arg: 'reason', type: 'string'}
+        {arg: 'reason', type: 'string'},
       ],
-      http: {path: '/uploadAppInfo', verb: 'post'}
+      http: {path: '/uploadAppInfo', verb: 'post'},
     }
   );
 
   Application.remoteMethod(
     'latestRelease',
     {
-      accepts: [{arg: 'id', type: "string"}],
+      accepts: [{arg: 'id', type: 'string'}],
       returns: {arg: 'value', type: 'Release', root: true},
-      http: {path: '/:id/latestRelease', verb: 'get'}
+      http: {path: '/:id/latestRelease', verb: 'get'},
     }
   );
 
-  Application.latestRelease = function (appId, cb) {
+  Application.remoteMethod(
+    'textSearch',
+    {
+      accepts: [{arg: 'query', type: '[string]'}],
+      returns: {arg: 'value', type: '[Application]', root: true},
+      http: {path: '/textSearch', verb: 'get'},
+    }
+  );
+
+  Application.textSearch = function(query, cb) {
+    let ApplicationTextsBlob = this.app.models.ApplicationTextsBlob;
+    let pattern = new RegExp(query, 'i');
+    ApplicationTextsBlob.find({
+      where: {text: {like: pattern}},
+      fields: {'text': false, 'applicationId': true, id: true},
+      include: {relation: 'application'},
+      limit: 32,
+    }).then((results) => {
+      let applications = [];
+      results.forEach(function(result) {
+        let r = result.toJSON();
+
+        applications.push(r.application);
+      });
+
+      cb(null, applications);
+    }).catch((err) => {
+      cb(err);
+    });
+  };
+
+  Application.latestRelease = function(appId, cb) {
     Application.findOne({where: {id: appId}})
       .then((app) => {
         if (app)
           return Application.getLatestRelease(app);
         else
-          return Promise.reject({'message': 'No application found with id: ' + appId, 'statusCode': 403})
+          return Promise.reject({'message': 'No application found with id: ' + appId, 'statusCode': 403});
       })
       .then((release) => {
         if (release)
@@ -37,20 +71,76 @@ module.exports = function (Application) {
         else
           Promise.reject({'message': 'No releases found for: ' + appId, 'statusCode': 403});
       }).catch((err) => {
-      cb(err);
-    });
+        cb(err);
+      });
   };
-  Application.register_appimage = function (appImageInfo, cb) {
+
+  Application.register_appimage = function(appImageInfo, cb) {
     if (!appImageInfo) {
-      return cb(null, {"accepted": false, "reason": "Empty 'AppImageInfo' field"});
+      return cb(null, {'accepted': false, 'reason': "Empty 'AppImageInfo' field"});
     }
     if (appImageInfo['format'] === 1)
       return Application.upload_format_1_appimageinfo(appImageInfo, cb);
 
-    return cb(null, {"accepted": false, "reason": "Unknown AppImageInfo format"});
+    return cb(null, {'accepted': false, 'reason': 'Unknown AppImageInfo format'});
   };
 
-  Application.upload_format_1_appimageinfo = function (info, cb) {
+  Application.observe('after save', function filterProperties(ctx, next) {
+    if (ctx.instance) {
+      let ApplicationTextsBlob = Application.app.models.ApplicationTextsBlob;
+      let i = ctx.instance;
+      let textsBlob = '';
+
+      let lcFieldConcat = function(obj) {
+        let blob = '';
+        if (obj) {
+          let values = Object.values(obj);
+          for (let i in values)
+            blob += ' ' + values[i];
+        }
+
+        return blob;
+      };
+
+      textsBlob += lcFieldConcat(i['name']);
+      textsBlob += lcFieldConcat(i['keywords']);
+      textsBlob += lcFieldConcat(i['abstract']);
+      textsBlob += lcFieldConcat(i['description']);
+
+      if (i['developer'])
+        textsBlob += ' ' + i['developer']['name'];
+
+      ApplicationTextsBlob.findOne({where: {applicationId: i.id}})
+        .then((result) => {
+          if (result) {
+            result['text'] = textsBlob;
+            console.log('Text Blob updated: ', textsBlob);
+            return result.save();
+          } else {
+            console.log('Text Blob created for: ', i.id);
+            return ApplicationTextsBlob.create(
+            {text: textsBlob, applicationId: i.id});
+          }
+        });
+    }
+
+    next();
+  });
+
+  Application.observe('before delete', function filterProperties(ctx, next) {
+    if (ctx.where.id) {
+      let ApplicationTextsBlob = Application.app.models.ApplicationTextsBlob;
+      ApplicationTextsBlob.remove({applicationId: ctx.where.id})
+        .then((result) => {
+          if (result.count > 0)
+            console.log('Text Blob deleted for :', ctx.where.id);
+        });
+    }
+
+    next();
+  });
+
+  Application.upload_format_1_appimageinfo = function(info, cb) {
     let releaseInfo = info['release'];
     delete info['release'];
 
@@ -68,7 +158,7 @@ module.exports = function (Application) {
         if (application)
           return Promise.resolve(application);
         else {
-          console.log("Creating application: " + info['id']);
+          console.log('Creating application: ' + info['id']);
           return Application.create(info);
         }
       })
@@ -79,13 +169,13 @@ module.exports = function (Application) {
         return Promise.all([t1, t2]);
       })
       .then((results) => {
-        cb(null, {"accepted": true, "reason": "All good!"})
+        cb(null, {'accepted': true, 'reason': 'All good!'});
       }).catch((err) => {
-      cb(err);
-    });
+        cb(err);
+      });
   };
 
-  Application.updateOrCreateRelease = function (app, releaseInfo, fileInfo) {
+  Application.updateOrCreateRelease = function(app, releaseInfo, fileInfo) {
     let releaseFind = null;
     if (releaseInfo['version'])
       releaseFind = app.releases.findOne({where: {version: releaseInfo.version}});
@@ -97,7 +187,6 @@ module.exports = function (Application) {
         return Promise.resolve(release);
       else
         return app.releases.create(releaseInfo);
-
     }).then((release) => {
       let findFile = release.files.findOne({where: {url: fileInfo.url}});
       return Promise.all([findFile, release]);
@@ -109,13 +198,13 @@ module.exports = function (Application) {
         for (let k in fileInfo)
           file[k] = fileInfo[k];
 
-        return file.save()
+        return file.save();
       } else
-        return release.files.create(fileInfo)
-    })
+        return release.files.create(fileInfo);
+    });
   };
 
-  Application.updateApplicationOnNewerRelease = function (application, newAppInfo, newReleaseInfo) {
+  Application.updateApplicationOnNewerRelease = function(application, newAppInfo, newReleaseInfo) {
     Application.getLatestRelease(application)
       .then((release) => {
         if (release) {
@@ -123,15 +212,15 @@ module.exports = function (Application) {
             for (let k in newAppInfo)
               application[k] = newAppInfo[k];
 
-            console.log("Application info updated.");
-            return application.save()
+            console.log('Application info updated.');
+            return application.save();
           }
         }
         return Promise.resolve();
       });
   };
 
-  Application.getLatestRelease = function (application) {
-    return application.releases.findOne({orderBy: 'date'})
-  }
+  Application.getLatestRelease = function(application) {
+    return application.releases.findOne({orderBy: 'date'});
+  };
 };

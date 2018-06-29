@@ -36,7 +36,7 @@
     "public": false
   },
   "Application": {
-    "dataSource": "db",
+    "dataSource": "mongodb",
     "public": true
   },
   "License": {

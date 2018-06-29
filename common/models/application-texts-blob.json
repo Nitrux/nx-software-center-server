@@ -9,6 +9,10 @@
     "text": {
       "type": "string",
       "required": true
+    },
+    "categories": {
+      "type": "string",
+      "required": false
     }
   },
   "validations": [],

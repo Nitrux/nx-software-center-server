@@ -27,19 +27,22 @@ module.exports = function(Application) {
   );
 
   Application.remoteMethod(
-    'textSearch',
+    'search',
     {
-      accepts: [{arg: 'query', type: '[string]'}],
+      accepts: [
+        {arg: 'query', type: '[string]'},
+        {arg: 'category', type: 'string'},
+      ],
       returns: {arg: 'value', type: '[Application]', root: true},
-      http: {path: '/textSearch', verb: 'get'},
+      http: {path: '/search', verb: 'get'},
     }
   );
 
-  Application.textSearch = function(query, cb) {
+  Application.search = function(query, category, cb) {
     let ApplicationTextsBlob = this.app.models.ApplicationTextsBlob;
     let pattern = new RegExp(query, 'i');
     ApplicationTextsBlob.find({
-      where: {text: {like: pattern}},
+      where: {text: {like: pattern}, categories: {like: category}},
       fields: {'text': false, 'applicationId': true, id: true},
       include: {relation: 'application'},
       limit: 32,
@@ -85,49 +88,60 @@ module.exports = function(Application) {
     return cb(null, {'accepted': false, 'reason': 'Unknown AppImageInfo format'});
   };
 
-  Application.observe('after save', function filterProperties(ctx, next) {
+  Application.l10nFieldConcat = function(obj) {
+    let blob = '';
+    if (obj) {
+      let values = Object.values(obj);
+      for (let i in values)
+        blob += ' ' + values[i];
+    }
+
+    return blob;
+  };
+
+  Application.observe('after save', function createApplicationTextBlob(ctx, next) {
     if (ctx.instance) {
       let ApplicationTextsBlob = Application.app.models.ApplicationTextsBlob;
       let i = ctx.instance;
+
       let textsBlob = '';
 
-      let lcFieldConcat = function(obj) {
-        let blob = '';
-        if (obj) {
-          let values = Object.values(obj);
-          for (let i in values)
-            blob += ' ' + values[i];
-        }
-
-        return blob;
-      };
-
-      textsBlob += lcFieldConcat(i['name']);
-      textsBlob += lcFieldConcat(i['keywords']);
-      textsBlob += lcFieldConcat(i['abstract']);
-      textsBlob += lcFieldConcat(i['description']);
+      textsBlob += Application.l10nFieldConcat(i['name']);
+      textsBlob += Application.l10nFieldConcat(i['keywords']);
+      textsBlob += Application.l10nFieldConcat(i['abstract']);
+      textsBlob += Application.l10nFieldConcat(i['description']);
 
       if (i['developer'])
         textsBlob += ' ' + i['developer']['name'];
+
+      let categoriesBlob = '';
+      if (i['categories'])
+        categoriesBlob = i['categories'].join(' ');
 
       ApplicationTextsBlob.findOne({where: {applicationId: i.id}})
         .then((result) => {
           if (result) {
             result['text'] = textsBlob;
+            result['categories'] = categoriesBlob;
             console.log('Text Blob updated: ', textsBlob);
             return result.save();
           } else {
             console.log('Text Blob created for: ', i.id);
             return ApplicationTextsBlob.create(
-            {text: textsBlob, applicationId: i.id});
+              {text: textsBlob,
+                applicationId: i.id,
+                categories: categoriesBlob}
+                );
           }
+        }).catch((err) => {
+          console.error(err);
         });
     }
 
     next();
   });
 
-  Application.observe('before delete', function filterProperties(ctx, next) {
+  Application.observe('before delete', function removeApplicationTextBlob(ctx, next) {
     if (ctx.where.id) {
       let ApplicationTextsBlob = Application.app.models.ApplicationTextsBlob;
       ApplicationTextsBlob.remove({applicationId: ctx.where.id})

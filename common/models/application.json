@@ -18,14 +18,14 @@
       "required": true,
       "properties": {}
     },
-    "summary": {
+    "abstract": {
       "type": "object",
-      "required": true,
+      "required": false,
       "properties": {}
     },
     "description": {
       "type": "object",
-      "required": true,
+      "required": false,
       "properties": {}
     },
     "developer": {
@@ -37,7 +37,17 @@
         "key" : { "type" : "string" }
       }
     },
+    "languages": {
+      "type": [
+        "string"
+      ]
+    },
     "categories": {
+      "type": [
+        "string"
+      ]
+    },
+    "mime-types": {
       "type": [
         "string"
       ]

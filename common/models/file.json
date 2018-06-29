@@ -10,7 +10,7 @@
       "type": "string",
       "required": true
     },
-    "sha512sum": {
+    "sha512checksum": {
       "type": "string",
       "required": true
     },
@@ -20,6 +20,10 @@
     },
     "architecture": {
       "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "number",
       "required": true
     }
   },

@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = function(app) {
   let Publisher = app.models.Publisher;
   Publisher.findOne({where: {username: 'root'}})

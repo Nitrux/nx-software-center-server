@@ -2,7 +2,7 @@
 
 module.exports = function(Application) {
   Application.remoteMethod(
-    'register_appimage',
+    'uploadAppInfo',
     {
       accepts: {
         arg: 'AppImageInfo',
@@ -79,7 +79,7 @@ module.exports = function(Application) {
       });
   };
 
-  Application.register_appimage = function(appImageInfo, cb) {
+  Application.uploadAppInfo = function(appImageInfo, cb) {
     if (!appImageInfo) {
       return cb(null, {'accepted': false, 'reason': "Empty 'AppImageInfo' field"});
     }

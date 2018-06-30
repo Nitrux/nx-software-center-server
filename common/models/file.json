@@ -31,6 +31,12 @@
   "relations": {},
   "acls": [
     {
+      "accessType": "READ",
+      "principalType": "ROLE",
+      "principalId": "$unauthenticated",
+      "permission": "ALLOW"
+    },
+    {
       "accessType": "WRITE",
       "principalType": "ROLE",
       "principalId": "$unauthenticated",

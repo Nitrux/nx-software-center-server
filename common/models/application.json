@@ -113,13 +113,20 @@
   },
   "acls": [
     {
-      "accessType": "WRITE",
+      "accessType": "EXECUTE",
       "principalType": "ROLE",
       "principalId": "$unauthenticated",
-      "permission": "DENY"
+      "permission": "DENY",
+      "property": "uploadAppInfo"
     },
     {
-      "accessType": "EXECUTE",
+      "accessType": "READ",
+      "principalType": "ROLE",
+      "principalId": "$unauthenticated",
+      "permission": "ALLOW"
+    },
+    {
+      "accessType": "WRITE",
       "principalType": "ROLE",
       "principalId": "$unauthenticated",
       "permission": "DENY"

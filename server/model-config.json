@@ -14,7 +14,8 @@
     ]
   },
   "User": {
-    "dataSource": "mongodb"
+    "dataSource": "mongodb",
+    "public": false
   },
   "AccessToken": {
     "dataSource": "db",
@@ -54,5 +55,9 @@
   "ApplicationTextsBlob": {
     "dataSource": "mongodb",
     "public": false
+  },
+  "Publisher": {
+    "dataSource": "mongodb",
+    "public": true
   }
 }

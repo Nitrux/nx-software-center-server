@@ -1,4 +1,4 @@
-  {
+{
   "name": "Application",
   "plural": "applications",
   "base": "PersistedModel",
@@ -31,10 +31,18 @@
     "developer": {
       "type": "object",
       "properties": {
-        "name" : { "type" : "string" },
-        "avatar" : { "type" : "string" },
-        "blog" : { "type" : "string" },
-        "key" : { "type" : "string" }
+        "name": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "blog": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        }
       }
     },
     "languages": {
@@ -69,10 +77,18 @@
       "type": "object",
       "required": false,
       "properties": {
-        "homePage" : { "type" : "string" },
-        "help" : { "type" : "string" },
-        "donations" : { "type" : "string" },
-        "bugtracker" : { "type" : "string" }
+        "homePage": {
+          "type": "string"
+        },
+        "help": {
+          "type": "string"
+        },
+        "donations": {
+          "type": "string"
+        },
+        "bugtracker": {
+          "type": "string"
+        }
       }
     }
   },
@@ -95,6 +111,19 @@
       }
     }
   },
-  "acls": [],
+  "acls": [
+    {
+      "accessType": "WRITE",
+      "principalType": "ROLE",
+      "principalId": "$unauthenticated",
+      "permission": "DENY"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$unauthenticated",
+      "permission": "DENY"
+    }
+  ],
   "methods": {}
 }

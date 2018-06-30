@@ -8,6 +8,7 @@ module.exports = function(Application) {
         arg: 'AppImageInfo',
         type: 'object',
         description: 'AppImageInfo to be uploaded.',
+        // root: true,
       },
       returns: [
         {arg: 'accepted', type: 'boolean'},
@@ -237,4 +238,21 @@ module.exports = function(Application) {
   Application.getLatestRelease = function(application) {
     return application.releases.findOne({orderBy: 'date'});
   };
+
+  Application.disableRemoteMethodByName('create');
+  Application.disableRemoteMethodByName('upsert');
+  Application.disableRemoteMethodByName('upsertWithWhere');
+  Application.disableRemoteMethodByName('replaceById');
+  Application.disableRemoteMethodByName('replaceOrCreate');
+  Application.disableRemoteMethodByName('deleteById');
+  Application.disableRemoteMethodByName('updateAll');
+  Application.disableRemoteMethodByName('prototype.replaceAttributes');
+  Application.disableRemoteMethodByName('prototype.updateAttributes');
+  Application.disableRemoteMethodByName('prototype.patchAttributes');
+  Application.disableRemoteMethodByName('createChangeStream');
+
+  Application.disableRemoteMethodByName('prototype.__create__releases');
+  Application.disableRemoteMethodByName('prototype.__delete__releases');
+  Application.disableRemoteMethodByName('prototype.__destroyById__releases');
+  Application.disableRemoteMethodByName('prototype.__updateById__releases');
 };

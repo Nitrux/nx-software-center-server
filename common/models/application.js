@@ -31,7 +31,7 @@ module.exports = function(Application) {
     'search',
     {
       accepts: [
-        {arg: 'query', type: '[string]'},
+        {arg: 'query', type: 'string'},
         {arg: 'category', type: 'string'},
       ],
       returns: {arg: 'value', type: '[Application]', root: true},
@@ -41,9 +41,20 @@ module.exports = function(Application) {
 
   Application.search = function(query, category, cb) {
     let ApplicationTextsBlob = this.app.models.ApplicationTextsBlob;
-    let pattern = new RegExp(query, 'i');
+
+    let whereField = {};
+    if (query) {
+      let queryPattern = new RegExp(query, 'i');
+      whereField.text = {regexp: queryPattern};
+    }
+
+    if (category) {
+      let categoryPattern = new RegExp(category, 'i');
+      whereField.categories = {regexp: categoryPattern};
+    }
+
     ApplicationTextsBlob.find({
-      where: {text: {like: pattern}, categories: {like: category}},
+      where: whereField,
       fields: {'text': false, 'applicationId': true, id: true},
       include: {relation: 'application'},
       limit: 32,
@@ -163,10 +174,6 @@ module.exports = function(Application) {
 
     delete info['file'];
     delete info['type'];
-
-    // console.log(info);
-    // console.log(releaseInfo);
-    // console.log(fileInfo);
 
     Application.findOne({where: {id: info.id}})
       .then((application) => {

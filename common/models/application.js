@@ -57,7 +57,6 @@ module.exports = function(Application) {
       where: whereField,
       fields: {'text': false, 'applicationId': true, id: true},
       include: {relation: 'application'},
-      limit: 32,
     }).then((results) => {
       let applications = [];
       results.forEach(function(result) {

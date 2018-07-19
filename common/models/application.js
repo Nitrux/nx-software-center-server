@@ -33,13 +33,15 @@ module.exports = function(Application) {
       accepts: [
         {arg: 'query', type: 'string'},
         {arg: 'category', type: 'string'},
+        {arg: 'offset', type: 'number'},
+        {arg: 'limit', type: 'number'},
       ],
       returns: {arg: 'value', type: '[Application]', root: true},
       http: {path: '/search', verb: 'get'},
     }
   );
 
-  Application.search = function(query, category, cb) {
+  Application.search = function(query, category, offset, limit, cb) {
     let ApplicationTextsBlob = this.app.models.ApplicationTextsBlob;
 
     let whereField = {};
@@ -57,6 +59,8 @@ module.exports = function(Application) {
       where: whereField,
       fields: {'text': false, 'applicationId': true, id: true},
       include: {relation: 'application'},
+      offset: offset,
+      limit: limit,
     }).then((results) => {
       let applications = [];
       results.forEach(function(result) {
